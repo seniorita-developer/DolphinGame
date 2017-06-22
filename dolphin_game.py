@@ -3,6 +3,7 @@ import pygame
 
 from settings import Settings
 from dolphin import Dolphin
+from fishers import Fisher
 import functions
 from pygame.sprite import Group
 
@@ -15,6 +16,7 @@ def run_game ():
     #Utworzenie statku kosmicznego
     dolphin=Dolphin(dolphingame_settings,screen)
     bubbles = Group()
+    fisher=Fisher(dolphingame_settings,screen)
 
     #rozpocięcie pętli glownej gry
     while True:
@@ -23,7 +25,7 @@ def run_game ():
         dolphin.update()
 
         functions.update_bubbles(bubbles)
-        functions.update_screen(dolphingame_settings, screen, dolphin, bubbles)
+        functions.update_screen(dolphingame_settings, screen, dolphin, fisher, bubbles)
 run_game()
 
 

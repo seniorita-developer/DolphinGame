@@ -49,7 +49,7 @@ def check_events(dolphingame_settings,screen, dolphin,bubbles):
         elif event.type==pygame.KEYUP:
             check_keyup_events(event,dolphin)
 
-def update_screen(dolphingame_settings,screen,dolphin,bubbles):
+def update_screen(dolphingame_settings,screen,dolphin,fisher, bubbles):
     '''Uaktualnienie obrazów na ekranie i przejście do nowego ekranu'''
     # odswieżenie ekranu w trakcie każdej iteracji pętli
     screen.fill(dolphingame_settings.bg_color)
@@ -58,6 +58,7 @@ def update_screen(dolphingame_settings,screen,dolphin,bubbles):
 
 
     dolphin.blitme()
+    fisher.blitme()
 
     # wyświetlanie ostatnio zmodyfikowanego ekranu.
     pygame.display.flip()

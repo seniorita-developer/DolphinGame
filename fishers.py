@@ -22,3 +22,17 @@ class Fisher(Sprite):
     def blitme(self):
         self.screen.blit(self.image,self.rect)
 
+
+    def check_edges(self):
+        screen_rect=self.screen.get_rect()
+        if self.rect.bottom>=screen_rect.bottom:
+            return True
+        elif self.rect.top <=0:
+            return True
+
+    def update(self):
+        '''Przesunięcie statku w dól'''
+        self.y+=(self.dolphingame_settings.fisher_speed_factor * self.dolphingame_settings.fishers_direction)
+        self.rect.y=self.y
+
+

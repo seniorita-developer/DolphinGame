@@ -8,12 +8,17 @@ class Settings():
         self.bg_color=(0,100,255)
 
         self.dolphin_speed_factor=1.5
-
-        self.bubble_speed_factor = 1
+        self.dolphin_limit=4
+        self.bubble_speed_factor = 3
         self.bubble_width = 6
         self.bubble_height = 6
         self.bubble_color = 255, 0, 0
         self.bubble_allowed = 5
+
+        self.fisher_speed_factor=1
+        self.fishers_drop_speed=10
+
+        self.fishers_direction=1
 
 
 

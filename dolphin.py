@@ -46,3 +46,7 @@ class Dolphin():
 
     def blitme(self):
         self.screen.blit(self.image, self.rect)
+
+    def center_dolphin(self):
+        #Umieszczenie delfina na środku ekranu
+        self.center=self.screen_rect.centerx

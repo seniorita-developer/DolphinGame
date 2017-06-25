@@ -1,6 +1,8 @@
 import sys
+from time import sleep
 import pygame
 from bubble import Bubble
+from fishers import Fisher
 
 def check_keydown_events(event, dolphingame_settings, screen, dolphin,bubbles):
     #reakcja na naciśnięcie klawisza
@@ -49,7 +51,7 @@ def check_events(dolphingame_settings,screen, dolphin,bubbles):
         elif event.type==pygame.KEYUP:
             check_keyup_events(event,dolphin)
 
-def update_screen(dolphingame_settings,screen,dolphin,fisher, bubbles):
+def update_screen(dolphingame_settings,screen,dolphin,fishers, bubbles):
     '''Uaktualnienie obrazów na ekranie i przejście do nowego ekranu'''
     # odswieżenie ekranu w trakcie każdej iteracji pętli
     screen.fill(dolphingame_settings.bg_color)
@@ -58,15 +60,104 @@ def update_screen(dolphingame_settings,screen,dolphin,fisher, bubbles):
 
 
     dolphin.blitme()
-    fisher.blitme()
+    fishers.draw(screen)
 
     # wyświetlanie ostatnio zmodyfikowanego ekranu.
     pygame.display.flip()
 
-def update_bubbles(bubbles):
+def check_bubble_ship_collisions(dolphingame_settings,screen,dolphin,fishers, bubbles):
+    collisions = pygame.sprite.groupcollide(bubbles, fishers, False, True)
+    if len(fishers)==0:
+        bubbles.empty()
+        create_fishers(dolphingame_settings,screen,dolphin,fishers)
+
+
+def update_bubbles(dolphingame_settings,screen,dolphin,fishers, bubbles):
     '''Uaktualnienie polożenia pocisków i usunięcie tych niewidocznych na ekranie'''
     bubbles.update()
 
     for bubble in bubbles.copy():
         if bubble.rect.left <= 0:
             bubbles.remove(bubble)
+    #Sprawdzenie czy bąbelki trafili w statek
+    check_bubble_ship_collisions(dolphingame_settings,screen,dolphin,fishers, bubbles)
+
+
+
+def get_number_fishers_y (dolphingame_settings,fisher_height):
+    available_space_y = dolphingame_settings.screen_height - (2 * fisher_height)
+    number_fishers_y = int(available_space_y / (2 * fisher_height))
+    return number_fishers_y
+
+
+def get_number_lines(dolphingame_settings,dolphin_width,fisher_width):
+    '''Ustalenie ile linii zmieszci się na ekranie'''
+    available_space_x = (dolphingame_settings.screen_width - (3* fisher_width)-dolphin_width)
+    number_lines = int((available_space_x / (2 * fisher_width))/2)
+    return number_lines
+
+
+def create_fisher(dolphingame_settings,screen,fishers,fisher_number,line_number):
+    '''Utworzenie statku i umieszczenie go w linii'''
+    fisher = Fisher(dolphingame_settings, screen)
+    fisher_height=fisher.rect.height
+    fisher.y = fisher_height + 2 * fisher_height * fisher_number
+    fisher.rect.y = fisher.y
+    fisher.rect.x=fisher.rect.width + 2*fisher.rect.width * line_number
+    fishers.add(fisher)
+
+def create_fishers(dolphingame_settings,screen,dolphin,fishers):
+    """Utworzenie wielu statków rybackich"""
+    #Utworzenie statku rybackiego i ustalenie liczby statków w linii
+    #Odleglość pomiędzy poszczególnymy statkami równa wysokości statku
+    fisher = Fisher(dolphingame_settings, screen)
+    number_fishers_y=get_number_fishers_y(dolphingame_settings,fisher.rect.height)
+    number_lines=get_number_lines(dolphingame_settings,dolphin.rect.width,fisher.rect.width)
+
+    #Utworzenie kilku linii statków
+    for line_number in range(number_lines):
+        for fisher_number in range (number_fishers_y):
+            create_fisher(dolphingame_settings,screen,fishers,fisher_number,line_number)
+
+
+def check_fishers_edges(dolphingame_settings,fishers):
+    '''Odpowiednia reakcja kiedy statek dotrze do krawędzi ekranu'''
+    for fisher in fishers.sprites():
+        if fisher.check_edges():
+            change_fishers_direction(dolphingame_settings,fishers)
+            break
+
+def change_fishers_direction(dolphingame_settings,fishers):
+    '''Przesunięcie wzystkich statków w prawo i zmiana kierunku w którym one sie poruszają'''
+    for fisher in fishers.sprites():
+        fisher.rect.x+= dolphingame_settings.fishers_drop_speed
+    dolphingame_settings.fishers_direction *= -1
+
+def dolphin_hit(dolphingame_settings,stats,screen,dolphin,fishers,bubbles):
+    '''Reakcja na uderzenie statku w delphina'''
+    if stats.dolphins_left > 0:
+        #Zmniejszenie wartości przechowywanej w dolphins_left
+        stats.dolphins_left -=1
+
+        #Usunięcie zawartości list fishers i bbubbles
+        fishers.empty()
+        bubbles.empty()
+
+        #Utworzenie nowych statków i wyśrodkowanie delfina
+        create_fishers(dolphingame_settings,screen,dolphin,fishers)
+        dolphin.center_dolphin()
+
+        #Pauza
+        sleep(0.5)
+    else:
+        stats.game_active = False
+
+
+def update_fishers(dolphingame_settings,stats,screen,dolphin,fishers,bubbles):
+    '''Sprawdzenie czy statki znajdują się przy krawędzi
+    ekranu a następnie uaktualnienie położenia wszystkich statków na ekranie'''
+    check_fishers_edges(dolphingame_settings, fishers)
+    fishers.update()
+    # Wykrywanie kolizji pomiędzy statkiem a delfinem
+    if pygame.sprite.spritecollideany(dolphin, fishers):
+        dolphin_hit(dolphingame_settings, stats, screen, dolphin, fishers, bubbles)

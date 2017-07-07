@@ -3,7 +3,7 @@ from pygame.sprite import Sprite
 
 
 class Bubble(Sprite):
-    '''Klasa przeznaczona do zarządzania pociskami wystrzeliwanymi przez statek'''
+    '''Klasa przeznaczona do zarządzania bąbelkami wystrzeliwanymi przez delfina'''
     def __init__(self,dolphingame_settings,screen,dolphin):
 
         '''Utworzenie obiektu pocisku w aktualnym położeniu delfina'''

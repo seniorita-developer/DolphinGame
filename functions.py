@@ -38,7 +38,7 @@ def check_keyup_events(event,dolphin):
         dolphin.moving_down = False
 
 
-def check_events(dolphingame_settings,screen, dolphin,bubbles):
+def check_events(dolphingame_settings,screen, stats,play_button,dolphin,fishers,bubbles):
     '''Reakcja na zdarzenia generowane przez klawiaturę i mysz'''
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -51,7 +51,27 @@ def check_events(dolphingame_settings,screen, dolphin,bubbles):
         elif event.type==pygame.KEYUP:
             check_keyup_events(event,dolphin)
 
-def update_screen(dolphingame_settings,screen,dolphin,fishers, bubbles):
+        elif event.type==pygame.MOUSEBUTTONDOWN:
+            mouse_x, mouse_y=pygame.mouse.get_pos()
+            check_play_button(dolphingame_settings,screen,stats,play_button,dolphin,fishers,bubbles,mouse_x,mouse_y)
+
+def check_play_button(dolphingame_settings,screen,stats,play_button,dolphin,fishers,bubbles,mouse_x,mouse_y):
+    button_clicked=play_button.rect.collidepoint(mouse_x,mouse_y)
+    if button_clicked and not stats.game_active:
+        #Ukrycie kursora myszy
+        pygame.mouse.set_visible(False)
+        stats.reset_stats()
+        stats.game_active=True
+
+        #Usunięcie zawarości list fishers i bubbles
+        fishers.empty()
+        bubbles.empty()
+
+        #Utworzenie nowych rybaków i wyśrodkowanie delfina
+        create_fishers(dolphingame_settings,screen,dolphin,fishers)
+        dolphin.center_dolphin()
+
+def update_screen(dolphingame_settings,screen,stats,dolphin,fishers, bubbles,play_button):
     '''Uaktualnienie obrazów na ekranie i przejście do nowego ekranu'''
     # odswieżenie ekranu w trakcie każdej iteracji pętli
     screen.fill(dolphingame_settings.bg_color)
@@ -61,7 +81,9 @@ def update_screen(dolphingame_settings,screen,dolphin,fishers, bubbles):
 
     dolphin.blitme()
     fishers.draw(screen)
-
+    #Wyświetlenie przycisku kiedy gra jest nieaktywna
+    if not stats.game_active:
+        play_button.draw_button()
     # wyświetlanie ostatnio zmodyfikowanego ekranu.
     pygame.display.flip()
 
@@ -151,7 +173,7 @@ def dolphin_hit(dolphingame_settings,stats,screen,dolphin,fishers,bubbles):
         sleep(0.5)
     else:
         stats.game_active = False
-
+        pygame.mouse.set_visible(True)
 
 def update_fishers(dolphingame_settings,stats,screen,dolphin,fishers,bubbles):
     '''Sprawdzenie czy statki znajdują się przy krawędzi

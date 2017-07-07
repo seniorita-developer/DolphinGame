@@ -58,6 +58,9 @@ def check_events(dolphingame_settings,screen, stats,play_button,dolphin,fishers,
 def check_play_button(dolphingame_settings,screen,stats,play_button,dolphin,fishers,bubbles,mouse_x,mouse_y):
     button_clicked=play_button.rect.collidepoint(mouse_x,mouse_y)
     if button_clicked and not stats.game_active:
+        #Wyzerowanie ustaiwen gry
+        dolphingame_settings.initialize_dynamic_settings()
+
         #Ukrycie kursora myszy
         pygame.mouse.set_visible(False)
         stats.reset_stats()
@@ -90,7 +93,9 @@ def update_screen(dolphingame_settings,screen,stats,dolphin,fishers, bubbles,pla
 def check_bubble_ship_collisions(dolphingame_settings,screen,dolphin,fishers, bubbles):
     collisions = pygame.sprite.groupcollide(bubbles, fishers, False, True)
     if len(fishers)==0:
+        #Usunięcie istniejących pocisków, przyspieszenie gry i utworzenie nowej floty
         bubbles.empty()
+        dolphingame_settings.increase_speed()
         create_fishers(dolphingame_settings,screen,dolphin,fishers)
 
 

@@ -23,6 +23,8 @@ class Settings():
 
         #Łatwa zmiana szybkości gry
         self.speedup_scale=1.1
+        #Zmiana liczby punktow przyznawanych za zatopienie statku
+        self.score_scale=1.5
 
         self.initialize_dynamic_settings()
 
@@ -33,9 +35,13 @@ class Settings():
         self.fisher_speed_factor = 1
         self.fishers_direction = 1
 
+        #Punktacja
+        self.dolphin_points=10
+
     def increase_speed(self):
         '''Zmiena ustawien dotyczących prędkości'''
         self.dolphin_speed_factor *=self.speedup_scale
         self.bubble_speed_factor *=self.speedup_scale
         self.fisher_speed_factor *=self.speedup_scale
 
+        self.dolphin_points=int(self.dolphin_points*self.score_scale)

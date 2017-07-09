@@ -38,7 +38,7 @@ def check_keyup_events(event,dolphin):
         dolphin.moving_down = False
 
 
-def check_events(dolphingame_settings,screen, stats,play_button,dolphin,fishers,bubbles):
+def check_events(dolphingame_settings,screen, stats, dolphin_scores,play_button, dolphin,fishers,bubbles):
     '''Reakcja na zdarzenia generowane przez klawiaturę i mysz'''
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -53,18 +53,23 @@ def check_events(dolphingame_settings,screen, stats,play_button,dolphin,fishers,
 
         elif event.type==pygame.MOUSEBUTTONDOWN:
             mouse_x, mouse_y=pygame.mouse.get_pos()
-            check_play_button(dolphingame_settings,screen,stats,play_button,dolphin,fishers,bubbles,mouse_x,mouse_y)
 
-def check_play_button(dolphingame_settings,screen,stats,play_button,dolphin,fishers,bubbles,mouse_x,mouse_y):
+            check_play_button(dolphingame_settings,screen,stats,dolphin_scores,play_button,dolphin,fishers,bubbles,mouse_x,mouse_y)
+
+def check_play_button(dolphingame_settings,screen,stats,dolphin_scores, play_button,dolphin,fishers,bubbles,mouse_x,mouse_y):
     button_clicked=play_button.rect.collidepoint(mouse_x,mouse_y)
     if button_clicked and not stats.game_active:
         #Wyzerowanie ustaiwen gry
         dolphingame_settings.initialize_dynamic_settings()
 
-        #Ukrycie kursora myszy
         pygame.mouse.set_visible(False)
+
         stats.reset_stats()
         stats.game_active=True
+
+        dolphin_scores.prepare_score()
+        dolphin_scores.prepare_high_score()
+        dolphin_scores.prepare_level()
 
         #Usunięcie zawarości list fishers i bubbles
         fishers.empty()
@@ -74,32 +79,44 @@ def check_play_button(dolphingame_settings,screen,stats,play_button,dolphin,fish
         create_fishers(dolphingame_settings,screen,dolphin,fishers)
         dolphin.center_dolphin()
 
-def update_screen(dolphingame_settings,screen,stats,dolphin,fishers, bubbles,play_button):
+def update_screen(dolphingame_settings,screen,stats, dolphin_scores, dolphin,fishers, bubbles,play_button):
     '''Uaktualnienie obrazów na ekranie i przejście do nowego ekranu'''
     # odswieżenie ekranu w trakcie każdej iteracji pętli
     screen.fill(dolphingame_settings.bg_color)
     for bubble in bubbles.sprites():
         bubble.draw_bubble()
 
-
     dolphin.blitme()
     fishers.draw(screen)
+    #Wyświetlenie informacji o punktacji
+    dolphin_scores.show_score()
+
     #Wyświetlenie przycisku kiedy gra jest nieaktywna
     if not stats.game_active:
         play_button.draw_button()
     # wyświetlanie ostatnio zmodyfikowanego ekranu.
     pygame.display.flip()
 
-def check_bubble_ship_collisions(dolphingame_settings,screen,dolphin,fishers, bubbles):
+def check_bubble_ship_collisions(dolphingame_settings,screen,stats,dolphin_scores,dolphin,fishers, bubbles):
     collisions = pygame.sprite.groupcollide(bubbles, fishers, False, True)
+    if collisions:
+        for fishers in collisions.values():
+            stats.score+=dolphingame_settings.dolphin_points*len(fishers)
+            dolphin_scores.prepare_score()
+        check_high_score(stats,dolphin_scores)
+
     if len(fishers)==0:
         #Usunięcie istniejących pocisków, przyspieszenie gry i utworzenie nowej floty
         bubbles.empty()
         dolphingame_settings.increase_speed()
+
+        stats.level+=1
+        dolphin_scores.prepare_level()
+
         create_fishers(dolphingame_settings,screen,dolphin,fishers)
 
 
-def update_bubbles(dolphingame_settings,screen,dolphin,fishers, bubbles):
+def update_bubbles(dolphingame_settings,screen,stats, dolphin_scores, dolphin,fishers, bubbles):
     '''Uaktualnienie polożenia pocisków i usunięcie tych niewidocznych na ekranie'''
     bubbles.update()
 
@@ -107,7 +124,7 @@ def update_bubbles(dolphingame_settings,screen,dolphin,fishers, bubbles):
         if bubble.rect.left <= 0:
             bubbles.remove(bubble)
     #Sprawdzenie czy bąbelki trafili w statek
-    check_bubble_ship_collisions(dolphingame_settings,screen,dolphin,fishers, bubbles)
+    check_bubble_ship_collisions(dolphingame_settings,screen,stats,dolphin_scores, dolphin,fishers, bubbles)
 
 
 
@@ -188,3 +205,9 @@ def update_fishers(dolphingame_settings,stats,screen,dolphin,fishers,bubbles):
     # Wykrywanie kolizji pomiędzy statkiem a delfinem
     if pygame.sprite.spritecollideany(dolphin, fishers):
         dolphin_hit(dolphingame_settings, stats, screen, dolphin, fishers, bubbles)
+
+def check_high_score(stats,dolphin_scores):
+    '''Sprawdzenie czy mamy nowy najlepszy wynik osiągnięty dotąd w grze'''
+    if stats.score>stats.high_score:
+        stats.high_score=stats.score
+        dolphin_scores.prepare_high_score()

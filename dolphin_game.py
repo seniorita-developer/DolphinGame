@@ -34,7 +34,7 @@ def run_game ():
         functions.check_events(dolphingame_settings,screen,stats, dolphin_scores, play_button,dolphin,fishers,bubbles)
         if stats.game_active:
             dolphin.update()
-            functions.update_fishers(dolphingame_settings, stats,screen, dolphin, fishers, bubbles)
+            functions.update_fishers(dolphingame_settings, screen, stats,dolphin_scores,dolphin, fishers, bubbles)
             functions.update_bubbles(dolphingame_settings,screen,stats, dolphin_scores, dolphin,fishers,bubbles)
         functions.update_screen(dolphingame_settings, screen, stats, dolphin_scores, dolphin, fishers, bubbles,play_button)
 run_game()

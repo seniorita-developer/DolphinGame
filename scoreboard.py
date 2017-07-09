@@ -1,5 +1,7 @@
 import pygame.font
+from pygame.sprite import Group
 
+from dolphin import Dolphin
 class Scoreboard():
     '''Klasa przeznaczona dla przedstawiania informacji o punktacji'''
 
@@ -15,6 +17,7 @@ class Scoreboard():
         self.prepare_score()
         self.prepare_high_score()
         self.prepare_level()
+        self.prepare_dolphins()
 
 
     def prepare_score(self):
@@ -45,6 +48,8 @@ class Scoreboard():
         self.screen.blit(self.score_image,self.score_rect)
         self.screen.blit(self.high_score_image, self.high_score_rect)
         self.screen.blit(self.level_image, self.level_rect)
+        self.dolphins.draw(self.screen)
+
     def prepare_level(self):
         '''Konwertacja numeru poziomu na wygenerowany obraz'''
         self.level_image = self.font.render(str(self.stats.level), True, self.text_color, self.dolphingame_settings.bg_color)
@@ -53,3 +58,14 @@ class Scoreboard():
         self.level_rect = self.level_image.get_rect()
         self.level_rect.right = self.screen_rect.right - 20
         self.level_rect.top = self.score_rect.bottom+20
+
+    def prepare_dolphins(self):
+        '''Wyświetla liczbę delfinow, ktore pozostaly graczowi'''
+        self.dolphins=Group()
+        for dolphin_number in range(self.stats.dolphins_left):
+            dolphin=Dolphin(self.dolphingame_settings,self.screen)
+            dolphin.rect.right=self.level_rect.right - dolphin_number*dolphin.rect.width
+            dolphin.rect.y= self.screen_rect.bottom-dolphin.rect.height-20
+            self.dolphins.add(dolphin)
+
+

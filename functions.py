@@ -70,6 +70,7 @@ def check_play_button(dolphingame_settings,screen,stats,dolphin_scores, play_but
         dolphin_scores.prepare_score()
         dolphin_scores.prepare_high_score()
         dolphin_scores.prepare_level()
+        dolphin_scores.prepare_dolphins()
 
         #Usunięcie zawarości list fishers i bubbles
         fishers.empty()
@@ -177,12 +178,12 @@ def change_fishers_direction(dolphingame_settings,fishers):
         fisher.rect.x+= dolphingame_settings.fishers_drop_speed
     dolphingame_settings.fishers_direction *= -1
 
-def dolphin_hit(dolphingame_settings,stats,screen,dolphin,fishers,bubbles):
+def dolphin_hit(dolphingame_settings,screen,stats,dolphin_scores, dolphin,fishers,bubbles):
     '''Reakcja na uderzenie statku w delphina'''
     if stats.dolphins_left > 0:
         #Zmniejszenie wartości przechowywanej w dolphins_left
         stats.dolphins_left -=1
-
+        dolphin_scores.prepare_dolphins()
         #Usunięcie zawartości list fishers i bbubbles
         fishers.empty()
         bubbles.empty()
@@ -197,14 +198,14 @@ def dolphin_hit(dolphingame_settings,stats,screen,dolphin,fishers,bubbles):
         stats.game_active = False
         pygame.mouse.set_visible(True)
 
-def update_fishers(dolphingame_settings,stats,screen,dolphin,fishers,bubbles):
+def update_fishers(dolphingame_settings,screen,stats,dolphin_scores,dolphin,fishers,bubbles):
     '''Sprawdzenie czy statki znajdują się przy krawędzi
     ekranu a następnie uaktualnienie położenia wszystkich statków na ekranie'''
     check_fishers_edges(dolphingame_settings, fishers)
     fishers.update()
     # Wykrywanie kolizji pomiędzy statkiem a delfinem
     if pygame.sprite.spritecollideany(dolphin, fishers):
-        dolphin_hit(dolphingame_settings, stats, screen, dolphin, fishers, bubbles)
+        dolphin_hit(dolphingame_settings,  screen,stats, dolphin_scores, dolphin, fishers, bubbles)
 
 def check_high_score(stats,dolphin_scores):
     '''Sprawdzenie czy mamy nowy najlepszy wynik osiągnięty dotąd w grze'''

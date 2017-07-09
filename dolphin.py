@@ -1,9 +1,11 @@
 import pygame
+from pygame.sprite import Sprite
 
-class Dolphin():
+class Dolphin(Sprite):
     def __init__(self,dolphingame_settings,screen):
 
-        #inicjalizacja statku kosmicznego i jego położenie początkowe.
+        #inicjalizacja delfina i jego położenie początkowe.
+        super(Dolphin,self).__init__()
         self.screen=screen
         self.dolphingame_settings=dolphingame_settings
 
@@ -12,14 +14,13 @@ class Dolphin():
         self.rect=self.image.get_rect()
         self.screen_rect=screen.get_rect()
 
-        #Każdy nowy statek pojawia się na środku ekranu.
+        #Każdy nowy delfin pojawia się na środku ekranu.
         self.rect.centerx=self.screen_rect.centerx
         self.rect.center =self.screen_rect.center
 
-        #Punkt środkowy statku jest przechowywany w postaci liczby zmiennoprzecinkowej
         self.center=float(self.rect.centerx)
 
-        #opcje wskazujące na poruszanie się statku
+        #opcje wskazujące na poruszanie się delfina
         self.moving_right=False
         self.moving_left = False
         self.moving_up = False

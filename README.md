@@ -1,5 +1,4 @@
 # DolphinGame
-My first Pygame experience
 Pomysł na grę pojawił się przez inspiracje grą "Alien invasion" i wycieszką do delfinarium.
 
 W grze "Dolphin Game" gracz kontroluje delfina, ktory wyswietla się na środku ekranu. 
